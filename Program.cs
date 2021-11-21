@@ -4,22 +4,24 @@ using System.Linq;
 
 namespace RarityCreator
 {
-   class Program
+   static class Program
    {
       static Random randomGenerator = new Random();
 
       // Configuration
-      const int CATEGORY_COUNT = 7;
+      const int CATEGORY_COUNT = 9;
       const int NFT_COUNT = 1111;
-      static int[] SUBCATEGORY_COUNTS = new int[CATEGORY_COUNT] { 10, 14, 5, 8, 4, 17, 3 };
+      static byte[] SUBCATEGORY_COUNTS = new byte[CATEGORY_COUNT] { 10, 10, 10, 10, 2, 12, 14, 21, 15 };
       static decimal[][] SUBCATEGORY_RATES = new decimal[CATEGORY_COUNT][] {
          new decimal[10] { 12/100m, 34/100m, 10/100m, 4/100m, 20/100m, 5/100m, 5/100m, 2/100m, 3/100m, 5/100m },
-         new decimal[14] { 1/28m, 1/28m, 10/28m, 2/28m, 1/28m, 1/28m, 1/28m, 1/28m, 1/28m, 1/28m, 1/28m, 1/28m, 1/28m, 5/28m },
-         new decimal[5] { 10/100m, 1/100m, 5/100m, 40/100m, 44/100m },
-         new decimal[8] { 8/80m, 12/80m, 20/80m, 30/80m, 1/80m, 4/80m, 2/80m, 3/80m },
-         new decimal[4] { 1/8m, 1/8m, 3/8m, 3/8m },
-         new decimal[17] { 5/37m, 8/37m, 5/37m, 4/37m, 1/37m, 2/37m, 1/37m, 1/37m, 1/37m, 1/37m, 1/37m, 1/37m, 1/37m, 1/37m, 1/37m, 1/37m, 2/37m },
-         new decimal[3] { 2/7m, 4/7m, 1/7m }
+         new decimal[10] { 12/100m, 34/100m, 10/100m, 4/100m, 20/100m, 5/100m, 5/100m, 2/100m, 3/100m, 5/100m },
+         new decimal[10] { 40/100m, 20/100m, 3/100m, 3/100m, 3/100m, 6/100m, 3/100m, 17/100m, 3/100m, 2/100m },
+         new decimal[10] { 12/100m, 24/100m, 10/100m, 4/100m, 20/100m, 5/100m, 15/100m, 2/100m, 3/100m, 5/100m },
+         new decimal[2] { 30/100m, 70/100m },
+         new decimal[12] { 2/24m, 2/24m, 2/24m, 2/24m, 2/24m, 2/24m, 2/24m, 2/24m, 2/24m, 2/24m, 2/24m, 2/24m },
+         new decimal[14] { 5/28m, 1/28m, 3/28m, 1/28m, 2/28m, 2/28m, 3/28m, 3/28m, 1/28m, 1/28m, 2/28m, 2/28m, 1/28m, 1/28m },
+         new decimal[21] { 8/42m, 2/42m, 1/42m, 1/42m, 5/42m, 2/42m, 1/42m, 4/42m, 1/42m, 1/42m, 2/42m, 1/42m, 3/42m, 2/42m, 2/42m, 1/42m, 1/42m, 1/42m, 1/42m, 1/42m, 1/42m },
+         new decimal[15] { 3/30m, 3/30m, 3/30m, 1/30m, 4/30m, 2/30m, 2/30m, 1/30m, 3/30m, 1/30m, 1/30m, 2/30m, 2/30m, 2/30m, 1/30m }
       };
       //const int CATEGORY_COUNT = 5;
       //const int NFT_COUNT = 80;
@@ -32,20 +34,22 @@ namespace RarityCreator
       //   new decimal[4] { 30/70m, 7/70m, 3/70m, 30/70m }
       //};
 
-      const int CROSSOVER_SIZE = NFT_COUNT/4;
+      const int CROSSOVER_SIZE = NFT_COUNT / 5;
 
       static void Main(string[] args)
       {
          //Pool of All Possible Combinations
          Population pool = new Population();
-         for (byte i = 0; i < SUBCATEGORY_COUNTS[0]; i++)
+         /*for (byte i = 0; i < SUBCATEGORY_COUNTS[0]; i++)
             for (byte j = 0; j < SUBCATEGORY_COUNTS[1]; j++)
                for (byte k = 0; k < SUBCATEGORY_COUNTS[2]; k++)
                   for (byte t = 0; t < SUBCATEGORY_COUNTS[3]; t++)
                      for (byte y = 0; y < SUBCATEGORY_COUNTS[4]; y++)
                         for (byte z = 0; z < SUBCATEGORY_COUNTS[5]; z++)
                            for (byte x = 0; x < SUBCATEGORY_COUNTS[6]; x++)
-                              pool.Add(new Gene(new byte[] { i, j, k, t, y, z, x }));
+                              for (byte o = 0; o < SUBCATEGORY_COUNTS[7]; o++)
+                                 for (byte n = 0; n < SUBCATEGORY_COUNTS[8]; n++)
+                                    pool.Add(new Gene(new byte[] { i, j, k, t, y, z, x, o, n }));*/
 
          //Population pool = new Population();
          //for (byte i = 0; i < SUBCATEGORY_COUNTS[0]; i++)
@@ -55,8 +59,9 @@ namespace RarityCreator
          //            for (byte z = 0; z < SUBCATEGORY_COUNTS[4]; z++)
          //               pool.Add(new Gene(new byte[] { i, j, k, t, z }));
 
-         Population parent1 = pool.Select(NFT_COUNT);
-         Population parent2 = pool.Select(NFT_COUNT);
+         Population parent1 = pool.SelectFromPool(NFT_COUNT);
+         Population parent2 = pool.SelectFromPool(NFT_COUNT);
+
          Console.WriteLine(Math.Round(parent1.Fitness() / parent1.MaxFitness * 10000) / 100 + "%");
          Console.WriteLine(Math.Round(parent2.Fitness() / parent2.MaxFitness * 10000) / 100 + "%");
 
@@ -83,7 +88,7 @@ namespace RarityCreator
                otherParent = parent1;
             }
 
-            Population child = bestParent.Crossover(parent2, pool);
+            Population child = bestParent.Crossover(otherParent, pool);
             decimal childFitness = child.Fitness();
             if (childFitness > bestFitness)
             {
@@ -102,47 +107,27 @@ namespace RarityCreator
             parent1 = bestParent;
             parent2 = otherParent;
 
-            if (bestFitness / bestParent.MaxFitness > 0.75m)
+            if (bestFitness / bestParent.MaxFitness > 0.62m)
             {
-               bestParent.Print();
+               Console.WriteLine(bestParent);
                break;
             }
          }
-
-         Console.ReadLine();
-         // Random Search
-         decimal bestRatio = 0m;
-         Population bestSelection = null;
-         do
-         {
-            Population selection = pool.Select(NFT_COUNT);
-            decimal fitness = selection.Fitness();
-            if (fitness / selection.MaxFitness > bestRatio)
-            {
-               bestRatio = fitness / selection.MaxFitness;
-               bestSelection = selection;
-               Console.WriteLine(Math.Round(bestRatio*1000)/10 + "%");
-            }
-         }
-         while (bestRatio < 0.95m);
-
-         // Print, if bestRatio is enough
-         bestSelection?.Print();
       }
 
-      class Population
+      public class Population
       {
-         internal Population()
+         public Population()
          {
             Genes = new List<Gene>();
          }
-         internal Population(List<Gene> genes)
+         public Population(List<Gene> genes)
          {
             Genes = genes;
             SetRates();
          }
 
-         internal decimal Fitness()
+         public decimal Fitness()
          {
             MaxFitness = 0;
 
@@ -160,25 +145,40 @@ namespace RarityCreator
 
             return fitness;
          }
-         internal void Add(Gene gene)
+         public bool Add(Gene gene)
          {
-            Genes.Add(gene);
-         }
-         internal void AddReverse(Gene gene)
-         {
-            Genes.Insert(0, gene);
-         }
-         internal void Add(List<Gene> genes)
-         {
-            foreach (Gene gene in genes)
+            if (!Genes.Contains(gene))
                Genes.Add(gene);
+            else
+               return false;
+
+            return true;
          }
-         internal void DeleteLast(int count)
+         public void Feed(Population pop, int count)
+         {
+            while (count > 0)
+            {
+               while (true)
+               {
+                  Gene gene = new Gene(new byte[] { (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[0]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[1]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[2]),
+                                                    (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[3]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[4]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[5]),
+                                                    (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[6]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[7]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[8]) });
+                  if (!Genes.Contains(gene))
+                  {
+                     Genes.Add(gene);
+                     break;
+                  }
+               }
+
+               count--;
+            }
+         }
+         public void DeleteLast(int count)
          {
             for (int i = 0; i < count; i++)
                Genes.RemoveAt(Genes.Count - 1);
          }
-         internal Population Select(int count)
+         public Population Select(int count)
          {
             List<Gene> clonedContent = new List<Gene>();
             foreach (Gene gene in Genes)
@@ -197,68 +197,85 @@ namespace RarityCreator
 
             return new Population(selectedList);
          }
-         internal Population Crossover(Population pop, Population pool)
+         public Population SelectFromPool(int count)
+         {
+            List<Gene> selectedList = new List<Gene>();
+            while (count > 0)
+            {
+               while (true)
+               {
+                  Gene gene = new Gene(new byte[] { (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[0]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[1]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[2]),
+                                                    (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[3]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[4]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[5]),
+                                                    (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[6]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[7]), (byte)randomGenerator.Next(SUBCATEGORY_COUNTS[8]) });
+                  if (!selectedList.Contains(gene))
+                  {
+                     selectedList.Add(gene);
+                     break;
+                  }
+               }
+
+               count--;
+            }
+
+            return new Population(selectedList);
+         }
+         public Population Crossover(Population pop, Population pool)
          {
             Population child = new Population();
             foreach (Gene gene in Genes)
                child.Add(new Gene(gene.Array));
 
-            child.Genes = child.Genes.Select(x => new { value = x, order = randomGenerator.Next() })
-                                     .OrderBy(x => x.order).Select(x => x.value).ToList();
+            Shuffle(child.Genes);
 
             child.DeleteLast(CROSSOVER_SIZE);
-            child.Add(pop.Select(CROSSOVER_SIZE).Genes);
+            child.Feed(pop, CROSSOVER_SIZE);
 
-            for (int i = 0; i < 10; i++) {
-               int index = randomGenerator.Next(NFT_COUNT);
-               child.Genes.RemoveAt(index);
-               child.Genes.Insert(index, pool.Select(1).Genes[0]);
+            while (true)
+            {
+               bool done = true;
+
+               List<Gene> range1 = child.Genes.GetRange(0, CROSSOVER_SIZE);
+               List<Gene> range2 = child.Genes.GetRange(child.Genes.Count - CROSSOVER_SIZE, CROSSOVER_SIZE);
+               for (int i = 0; i < range1.Count; i++)
+               {
+                  Gene gene1 = range1[i];
+
+                  for (int j = 0; j < range2.Count; j++)
+                  {
+                     Gene gene2 = range2[j];
+
+                     if (gene2.Equals(gene1))
+                     {
+                        child.Genes.RemoveAt(i);
+                        child.Genes.Insert(i, pool.SelectFromPool(1).Genes[0]);
+                        done = false;
+                     }
+                  }
+
+                  if (done == false)
+                     break;
+               }
+
+               if (done)
+                  break;
             }
-
-            //while (true)
-            //{
-            //   bool done = true;
-
-            //   List<Gene> range1 = child.Genes.GetRange(0, CROSSOVER_SIZE);
-            //   List<Gene> range2 = child.Genes.GetRange(child.Genes.Count - CROSSOVER_SIZE, CROSSOVER_SIZE);
-            //   for (int i = 0; i < range1.Count; i++)
-            //   {
-            //      Gene gene1 = range1[i];
-
-            //      for (int j = 0; j < range2.Count; j++)
-            //      {
-            //         Gene gene2 = range2[j];
-
-            //         if (gene2.IsEqual(gene1))
-            //         {
-            //            child.Genes.RemoveAt(i);
-            //            child.Genes.Insert(i, pool.Select(1).Genes[0]);
-            //            done = false;
-            //         }
-            //      }
-
-            //      if (done == false)
-            //         break;
-            //   }
-
-            //   if (done)
-            //      break;
-            //}
 
             child.SetRates();
             return child;
          }
 
-         internal void SetRates()
+         public void SetRates()
          {
             Subcategory_rates = new decimal[CATEGORY_COUNT][] {
                new decimal[10],
+               new decimal[10],
+               new decimal[10],
+               new decimal[10],
+               new decimal[2],
+               new decimal[12],
                new decimal[14],
-               new decimal[5],
-               new decimal[8],
-               new decimal[4],
-               new decimal[17],
-               new decimal[3]
+               new decimal[21],
+               new decimal[15]
             };
             //Subcategory_rates = new decimal[CATEGORY_COUNT][] {
             //   new decimal[4],
@@ -276,44 +293,35 @@ namespace RarityCreator
                   Subcategory_rates[j][gene.Array[j]] += 1m / Genes.Count;
             }
          }
-         internal void Print()
+         public override string ToString()
          {
-            Console.WriteLine("Population: ");
+            string str = "Population: ";
 
             foreach (Gene gene in Genes)
-               gene.Print();
+               str += gene.ToString();
 
-            Console.WriteLine("_________");
-
+            str += "_________";
             for (int i = 0; i < Subcategory_rates.Length; i++)
                for (int j = 0; j < Subcategory_rates[i].Length; j++)
-                  Console.WriteLine((char)('A' + i) + "" + j + ": " + Math.Round(Subcategory_rates[i][j] * 1000) / 10 + "%");
+                  str += (char)('A' + i) + "" + j + ": " + Math.Round(Subcategory_rates[i][j] * 1000) / 10 + "%\n";
 
-            Console.WriteLine("Fitness: " + Fitness() + "/" + MaxFitness);
+            return "Fitness: " + Fitness() + "/" + MaxFitness + "\n";
          }
 
-         List<Gene> Genes { get; set; }
-         decimal[][] Subcategory_rates { get; set; }
+         public List<Gene> Genes { get; set; }
+         public decimal[][] Subcategory_rates { get; set; }
          public decimal MaxFitness { get; set; }
       }
-      class Gene
+      public class Gene
       {
          public Gene(byte[] array)
          {
             Array = array;
          }
 
-         internal void Print()
+         public override bool Equals(object obj)
          {
-            foreach (byte _byte in Array)
-               Console.Write(_byte + " ");
-
-            Console.WriteLine();
-         }
-         internal bool IsEqual(Gene gene)
-         {
-            if (gene.Array.Length != Array.Length)
-               return false;
+            Gene gene = (Gene)obj;
 
             for (int i = 0; i < gene.Array.Length; i++)
                if (Array[i] != gene.Array[i])
@@ -321,8 +329,34 @@ namespace RarityCreator
 
             return true;
          }
+         public override int GetHashCode()
+         {
+            return Array.GetHashCode();
+         }
+         public override string ToString()
+         {
+            string str = "";
 
-         internal byte[] Array { get; set; }
+            foreach (byte _byte in Array)
+               str += _byte + " ";
+
+            return str + "\n";
+         }
+
+         public byte[] Array { get; set; }
+      }
+
+      static public void Shuffle<T>(this IList<T> list)
+      {
+         int n = list.Count;
+         while (n > 1)
+         {
+            n--;
+            int k = randomGenerator.Next(n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+         }
       }
    }
 }
