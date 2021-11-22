@@ -10,8 +10,8 @@ namespace RarityCreator
       // Configuration
       const int CATEGORY_COUNT = 9;
       const int NFT_COUNT = 1111;
-      static byte[] SUBCATEGORY_COUNTS = new byte[CATEGORY_COUNT] { 10, 10, 10, 10, 2, 12, 14, 21, 15 };
-      static decimal[][] SUBCATEGORY_RATES = new decimal[CATEGORY_COUNT][] {
+      static byte[] SUBCATEGORY_COUNTS = new byte[CATEGORY_COUNT] { 9, 9, 1, 9, 9, 21, 21, 25, 16 };
+      /*static decimal[][] SUBCATEGORY_RATES = new decimal[CATEGORY_COUNT][] {
          new decimal[10] { 12/100m, 34/100m, 10/100m, 4/100m, 20/100m, 5/100m, 5/100m, 2/100m, 3/100m, 5/100m },
          new decimal[10] { 12/100m, 34/100m, 10/100m, 4/100m, 20/100m, 5/100m, 5/100m, 2/100m, 3/100m, 5/100m },
          new decimal[10] { 40/100m, 20/100m, 3/100m, 3/100m, 3/100m, 6/100m, 3/100m, 17/100m, 3/100m, 2/100m },
@@ -21,7 +21,7 @@ namespace RarityCreator
          new decimal[14] { 5/28m, 1/28m, 3/28m, 1/28m, 2/28m, 2/28m, 3/28m, 3/28m, 1/28m, 1/28m, 2/28m, 2/28m, 1/28m, 1/28m },
          new decimal[21] { 8/42m, 2/42m, 1/42m, 1/42m, 5/42m, 2/42m, 1/42m, 4/42m, 1/42m, 1/42m, 2/42m, 1/42m, 3/42m, 2/42m, 2/42m, 1/42m, 1/42m, 1/42m, 1/42m, 1/42m, 1/42m },
          new decimal[15] { 3/30m, 3/30m, 3/30m, 1/30m, 4/30m, 2/30m, 2/30m, 1/30m, 3/30m, 1/30m, 1/30m, 2/30m, 2/30m, 2/30m, 1/30m }
-      };
+      };*/
 
       // Genetic Algorithm Configuration
       const int CROSSOVER_SIZE = NFT_COUNT / 20;
@@ -126,23 +126,23 @@ namespace RarityCreator
          public void CalculateRates()
          {
             Subcategory_rates = new decimal[CATEGORY_COUNT][] {
-               new decimal[10],
-               new decimal[10],
-               new decimal[10],
-               new decimal[10],
-               new decimal[2],
-               new decimal[12],
-               new decimal[14],
+               new decimal[9],
+               new decimal[9],
+               new decimal[1],
+               new decimal[9],
+               new decimal[9],
                new decimal[21],
-               new decimal[15]
+               new decimal[21],
+               new decimal[25],
+               new decimal[16]
             };
-            //Subcategory_rates = new decimal[CATEGORY_COUNT][] {
-            //   new decimal[4],
-            //   new decimal[5],
-            //   new decimal[6],
-            //   new decimal[7],
-            //   new decimal[4]
-            //};
+            /*Subcategory_rates = new decimal[CATEGORY_COUNT][] {
+               new decimal[4],
+               new decimal[5],
+               new decimal[6],
+               new decimal[7],
+               new decimal[4]
+            };*/
 
             for (int i = 0; i < Genes.Count; i++)
             {
