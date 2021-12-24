@@ -10,7 +10,9 @@ namespace RarityCreator
       // Configuration
       const int CATEGORY_COUNT = 10;
       const int NFT_COUNT = 5555;
-      static byte[] SUBCATEGORY_COUNTS = new byte[CATEGORY_COUNT] { 9 + 1, 9 + 1, 1, 9 + 1, 9 + 1, 22 + 1, 30 + 1, 26 + 1, 17 + 1, 13 + 5 };
+      const int LAST_CATEGORY_DUPLICATION = 6;
+      const int LAST_CATEGORY_SUBCATEGORIES_COUNT = 12 + LAST_CATEGORY_DUPLICATION;
+      static byte[] SUBCATEGORY_COUNTS = new byte[CATEGORY_COUNT] { 9, 9, 1, 9, 9, 22, 30, 26, 17, LAST_CATEGORY_SUBCATEGORIES_COUNT };
       /*static decimal[][] SUBCATEGORY_RATES = new decimal[CATEGORY_COUNT][] {
          new decimal[10] { 12/100m, 34/100m, 10/100m, 4/100m, 20/100m, 5/100m, 5/100m, 2/100m, 3/100m, 5/100m },
          new decimal[10] { 12/100m, 34/100m, 10/100m, 4/100m, 20/100m, 5/100m, 5/100m, 2/100m, 3/100m, 5/100m },
@@ -41,7 +43,7 @@ namespace RarityCreator
          Console.WriteLine(Math.Round(habitat.Keys[habitat.Count - 1] * 100) / 100 + " (at 0)");
 
          int tryCount = 0;
-         while (tryCount < 16000)
+         while (tryCount < 20000)
          {
             tryCount++;
 
@@ -131,24 +133,17 @@ namespace RarityCreator
          public void CalculateRates()
          {
             Subcategory_rates = new decimal[CATEGORY_COUNT][] {
-               new decimal[9+1],
-               new decimal[9+1],
+               new decimal[9],
+               new decimal[9],
                new decimal[1],
-               new decimal[9+1],
-               new decimal[9+1],
-               new decimal[22+1],
-               new decimal[30+1],
-               new decimal[26+1],
-               new decimal[17+1],
-               new decimal[13+5]
+               new decimal[9],
+               new decimal[9],
+               new decimal[22],
+               new decimal[30],
+               new decimal[26],
+               new decimal[17],
+               new decimal[LAST_CATEGORY_SUBCATEGORIES_COUNT]
             };
-            /*Subcategory_rates = new decimal[CATEGORY_COUNT][] {
-               new decimal[4],
-               new decimal[5],
-               new decimal[6],
-               new decimal[7],
-               new decimal[4]
-            };*/
 
             for (int i = 0; i < Genes.Count; i++)
             {
@@ -189,8 +184,19 @@ namespace RarityCreator
             foreach (Gene gene in Genes)
             {
                decimal possibility = 1;
-               for (int i = 3; i < CATEGORY_COUNT; i++)
-                  possibility *= (decimal)Math.Pow((double)Subcategory_rates[i][gene.Array[i]], 1.4);
+
+               // Last category rate
+               decimal lastCategoryRate = 0;
+               for (int i = SUBCATEGORY_COUNTS[CATEGORY_COUNT - 1] - LAST_CATEGORY_DUPLICATION; i < SUBCATEGORY_COUNTS[CATEGORY_COUNT - 1]; i++)
+                  lastCategoryRate += Subcategory_rates[CATEGORY_COUNT - 1][gene.Array[CATEGORY_COUNT - 1]];
+
+               var skippedCategories = 3;
+               for (int i = skippedCategories; i < CATEGORY_COUNT; i++)
+                  // Last category is special
+                  if (i == CATEGORY_COUNT - 1 && gene.Array[i] >= LAST_CATEGORY_SUBCATEGORIES_COUNT - LAST_CATEGORY_DUPLICATION)
+                     possibility *= (decimal)Math.Pow((double)lastCategoryRate, 1.37);
+                  else
+                     possibility *= (decimal)Math.Pow((double)Subcategory_rates[i][gene.Array[i]], 1.37);
                averagePossibility += possibility / Genes.Count * 100;
 
                possibilities.Add(possibility);
@@ -291,15 +297,7 @@ namespace RarityCreator
             Gene gene = (Gene)obj;
 
             for (int i = 0; i < gene.Array.Length; i++)
-               if (Array[i] != gene.Array[i] || (i == 0 && Array[i] >= 8 && gene.Array[i] >= 8 && Math.Abs(Array[i] - gene.Array[i]) <= 1)
-                                             || (i == 1 && Array[i] >= 8 && gene.Array[i] >= 8 && Math.Abs(Array[i] - gene.Array[i]) <= 1)
-                                             || (i == 3 && Array[i] >= 8 && gene.Array[i] >= 8 && Math.Abs(Array[i] - gene.Array[i]) <= 1)
-                                             || (i == 4 && Array[i] >= 8 && gene.Array[i] >= 8 && Math.Abs(Array[i] - gene.Array[i]) <= 1)
-                                             || (i == 5 && Array[i] >= 21 && gene.Array[i] >= 8 && Math.Abs(Array[i] - gene.Array[i]) <= 1)
-                                             || (i == 6 && Array[i] >= 29 && gene.Array[i] >= 8 && Math.Abs(Array[i] - gene.Array[i]) <= 1)
-                                             || (i == 7 && Array[i] >= 15 && gene.Array[i] >= 8 && Math.Abs(Array[i] - gene.Array[i]) <= 1)
-                                             || (i == 8 && Array[i] >= 16 && gene.Array[i] >= 8 && Math.Abs(Array[i] - gene.Array[i]) <= 1)
-                                             || (i == 9 && Array[i] >= 13 && gene.Array[i] >= 13 && Math.Abs(Array[i] - gene.Array[i]) <= 5))
+               if (Array[i] != gene.Array[i] || (i == 9 && Array[i] >= LAST_CATEGORY_SUBCATEGORIES_COUNT - LAST_CATEGORY_DUPLICATION && gene.Array[i] >= LAST_CATEGORY_SUBCATEGORIES_COUNT - LAST_CATEGORY_DUPLICATION && Math.Abs(Array[i] - gene.Array[i]) <= LAST_CATEGORY_DUPLICATION))
                   return false;
 
             return true;
