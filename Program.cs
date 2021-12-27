@@ -27,7 +27,7 @@ namespace RarityCreator
 
       // Genetic Algorithm Configuration
       const int CROSSOVER_SIZE = 0;
-      const int MUTATION_SIZE = NFT_COUNT / 20;
+      const int MUTATION_SIZE = NFT_COUNT / 16;
 
       static void Main(string[] args)
       {
@@ -43,7 +43,7 @@ namespace RarityCreator
          Console.WriteLine(Math.Round(habitat.Keys[habitat.Count - 1] * 100) / 100 + " (at 0)");
 
          int tryCount = 0;
-         while (tryCount < 20000)
+         while (tryCount < 22000)
          {
             tryCount++;
 
@@ -194,9 +194,9 @@ namespace RarityCreator
                for (int i = skippedCategories; i < CATEGORY_COUNT; i++)
                   // Last category is special
                   if (i == CATEGORY_COUNT - 1 && gene.Array[i] >= LAST_CATEGORY_SUBCATEGORIES_COUNT - LAST_CATEGORY_DUPLICATION)
-                     possibility *= (decimal)Math.Pow((double)lastCategoryRate, 1.37);
+                     possibility *= (decimal)Math.Pow((double)lastCategoryRate, 1.26);
                   else
-                     possibility *= (decimal)Math.Pow((double)Subcategory_rates[i][gene.Array[i]], 1.37);
+                     possibility *= (decimal)Math.Pow((double)Subcategory_rates[i][gene.Array[i]], 1.26);
                averagePossibility += possibility / Genes.Count * 100;
 
                possibilities.Add(possibility);
