@@ -10,7 +10,7 @@ namespace RarityCreator
       // Configuration
       const int CATEGORY_COUNT = 10;
       const int NFT_COUNT = 5555;
-      const int LAST_CATEGORY_DUPLICATION = 6;
+      const int LAST_CATEGORY_DUPLICATION = 5;
       const int LAST_CATEGORY_SUBCATEGORIES_COUNT = 12 + LAST_CATEGORY_DUPLICATION;
       static byte[] SUBCATEGORY_COUNTS = new byte[CATEGORY_COUNT] { 9, 9, 1, 9, 9, 22, 30, 26, 17, LAST_CATEGORY_SUBCATEGORIES_COUNT };
       /*static decimal[][] SUBCATEGORY_RATES = new decimal[CATEGORY_COUNT][] {
@@ -27,12 +27,12 @@ namespace RarityCreator
 
       // Genetic Algorithm Configuration
       const int CROSSOVER_SIZE = 0;
-      const int MUTATION_SIZE = NFT_COUNT / 16;
+      const int MUTATION_SIZE = NFT_COUNT / 15;
 
       static void Main(string[] args)
       {
          SortedList<decimal, Population> habitat = new SortedList<decimal, Population>();
-         for (int i = 0; i < 400; i++)
+         for (int i = 0; i < 800; i++)
          {
             Population pop = new Population();
             pop.Feed(NFT_COUNT);
@@ -43,7 +43,7 @@ namespace RarityCreator
          Console.WriteLine(Math.Round(habitat.Keys[habitat.Count - 1] * 100) / 100 + " (at 0)");
 
          int tryCount = 0;
-         while (tryCount < 22000)
+         while (tryCount < 35000)
          {
             tryCount++;
 
@@ -194,9 +194,9 @@ namespace RarityCreator
                for (int i = skippedCategories; i < CATEGORY_COUNT; i++)
                   // Last category is special
                   if (i == CATEGORY_COUNT - 1 && gene.Array[i] >= LAST_CATEGORY_SUBCATEGORIES_COUNT - LAST_CATEGORY_DUPLICATION)
-                     possibility *= (decimal)Math.Pow((double)lastCategoryRate, 1.26);
+                     possibility *= (decimal)Math.Pow((double)lastCategoryRate, 1.35);
                   else
-                     possibility *= (decimal)Math.Pow((double)Subcategory_rates[i][gene.Array[i]], 1.26);
+                     possibility *= (decimal)Math.Pow((double)Subcategory_rates[i][gene.Array[i]], 1.35);
                averagePossibility += possibility / Genes.Count * 100;
 
                possibilities.Add(possibility);
@@ -250,10 +250,21 @@ namespace RarityCreator
             foreach (Gene gene in Genes)
             {
                decimal possibility = 1;
-               for (int i = 0; i < CATEGORY_COUNT; i++)
-                  possibility *= Subcategory_rates[i][gene.Array[i]];
 
-               _genes.Add(possibility + (decimal)randomGenerator.Next(100000) / 1000000000000000000, gene);
+               // Last category rate
+               decimal lastCategoryRate = 0;
+               for (int i = SUBCATEGORY_COUNTS[CATEGORY_COUNT - 1] - LAST_CATEGORY_DUPLICATION; i < SUBCATEGORY_COUNTS[CATEGORY_COUNT - 1]; i++)
+                  lastCategoryRate += Subcategory_rates[CATEGORY_COUNT - 1][gene.Array[CATEGORY_COUNT - 1]];
+
+               var skippedCategories = 3;
+               for (int i = skippedCategories; i < CATEGORY_COUNT; i++)
+                  // Last category is special
+                  if (i == CATEGORY_COUNT - 1 && gene.Array[i] >= LAST_CATEGORY_SUBCATEGORIES_COUNT - LAST_CATEGORY_DUPLICATION)
+                     possibility *= (decimal)Math.Pow((double)lastCategoryRate, 1.35);
+                  else
+                     possibility *= (decimal)Math.Pow((double)Subcategory_rates[i][gene.Array[i]], 1.35);
+
+               _genes.Add((possibility * 1000000000 + (decimal)randomGenerator.Next(100000) / 1000000000000000000) / 1000000000, gene);
             }
 
             for (int i = _genes.Count - 1; i >= 0; i--)
